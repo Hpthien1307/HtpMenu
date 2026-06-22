@@ -1,0 +1,110 @@
+@use "../core/index" as *;
+
+.hd {
+    height: var(--size-hd);
+    @include transition(0.4s, ease);
+
+    &.hide-hd {
+        transform: translateY(calc(-1 * var(--hide-hd)));
+    }
+
+    &-custom {
+        box-shadow: 0 0.5rem 2rem 0.1rem rgba(0, 0, 0, 0.1);
+    }
+
+    &-top {
+        height: var(--size-hd-top);
+        border-bottom: 1px solid #ebebeb;
+
+        .txt {
+            font-size: 1.5rem;
+            color: #242424;
+        }
+    }
+
+    &-center {
+        height: var(--size-hd-center);
+    }
+
+    &-bot {
+        height: var(--size-hd-bot);
+    }
+}
+
+.hd-nav {
+    height: 100%;
+
+    .menu-list {
+        display: flex;
+
+        .menu-item {
+            @include hover() {
+                .menu-link {
+                    color: var(--color-sec);
+
+                    i {
+                        transform: rotate(180deg);
+                    }
+                }
+            }
+
+            .menu-link {
+                color: white;
+                @include transition(0.3s, ease);
+
+                i {
+                    @include mid-flex;
+                    width: 1.2rem;
+                    aspect-ratio: 1/1;
+                    @include transition(0.3s, ease);
+                }
+            }
+        }
+    }
+}
+
+.hd-logo {
+    display: block;
+    height: 100%;
+    @include mid-flex;
+
+    .custom-logo-link {
+        display: flex;
+        width: var(--w-logo);
+        @include transition(0.4s, ease);
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            @include transition(0.4s, ease);
+        }
+    }
+}
+
+.hd-actions {
+    --gap: 1.6rem;
+    gap: var(--gap);
+
+    @include max($res-mobile-max) {
+        --gap: 0.8rem;
+    }
+
+    &-item {
+        display: flex;
+
+        > a {
+            @include item-shrink(3.2rem);
+
+            @include max($res-mobile-max) {
+                width: 2.4rem;
+                height: 2.4rem;
+            }
+        }
+
+        &:not(:last-child) {
+            padding-right: var(--gap);
+            border-right: 1px solid #dfdfdf;
+        }
+    }
+}

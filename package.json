@@ -1,0 +1,13 @@
+{
+  "name": "hpt-menu-workspace",
+  "version": "1.0.0",
+  "description": "Root workspace to start frontend and backend concurrently",
+  "scripts": {
+    "dev": "concurrently \"npm:backend\" \"npm:frontend\"",
+    "backend": "cd Backend && npm run start:dev",
+    "frontend": "cd Frontend && npm run dev"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

@@ -1,0 +1,276 @@
+@mixin max($value) {
+    @media screen and (max-width: $value) {
+        @content;
+    }
+}
+
+@mixin min-max($min, $max) {
+    @media (min-width: $min) and (max-width: $max) {
+        @content;
+    }
+}
+
+@mixin min($value) {
+    @media screen and (min-width: $value) {
+        @content;
+    }
+}
+
+@mixin flex() {
+    display: flex;
+}
+
+@mixin flex-wr() {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+@mixin mid-flex() {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin flex-col {
+    @include flex;
+    flex-direction: column;
+}
+
+@mixin imgPd($ver, $hori) {
+    display: block;
+    padding-top: calc((#{$ver} / #{$hori}) * 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+@mixin imgCover {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+@mixin imgContain {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+@mixin lc($value: 3) {
+    display: -webkit-box;
+    -webkit-line-clamp: $value;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+@mixin transition($time: 0.1s, $style: ease-in-out, $delay: 0s) {
+    transition: $time $style;
+    -webkit-transition: $time $style;
+    transition-delay: $delay;
+    -webkit-transition-delay: $delay;
+}
+
+
+@mixin default-background($repeat: no-repeat, $position: center, $size: cover) {
+    background-repeat: $repeat;
+    background-position: $position;
+    background-size: $size;
+}
+
+@mixin custom-background($url, $position, $size) {
+    background: url($url) $postion/$size no-repeat;
+}
+
+@mixin scroll-hidden {
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+@mixin full-fixed($t: 0, $r: 0, $b: 0, $l: 0) {
+    position: fixed;
+    left: $l;
+    top: $t;
+    right: $r;
+    bottom: $b;
+}
+
+@mixin full($t: 0, $r: 0, $b: 0, $l: 0) {
+    top: $t;
+    right: $r;
+    bottom: $b;
+    left: $l;
+}
+
+@mixin hover-scale {
+    transform: translate(-50%, -50%) scale(1.05);
+    -webkit-transform: translate(-50%, -50%) scale(1.05);
+}
+
+@mixin posi-mid {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@mixin posi-vertical {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+}
+
+@mixin posi-horizontal {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    -webkit-transform: translateX(-50%);
+}
+
+@mixin hidden($x: 0, $y: 0) {
+    opacity: 0;
+    visibility: hidden;
+    transform: translate($x, $y);
+}
+
+@mixin show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(0, 0);
+}
+
+@mixin hover-zoom($scale: 1.05) {
+    transform: scale($scale);
+    -webkit-transform: scale($scale);
+}
+
+@mixin hover-zoom-abs($scale: 1.05) {
+    transform: scale($scale) translate(-50%, -50%);
+    -webkit-transform: scale($scale);
+}
+
+@mixin midle($p) {
+    @if $p=="abs-ver" {
+        position: absolute;
+        top: 50%;
+        transform: translateY(0, -50%);
+        -webkit-transform: translateY(0, -50%);
+    }
+
+    @else if $p=="abs-hori" {
+        position: absolute;
+        left: 50%;
+        transform: translate(-50%, 0);
+        -webkit-transform: translate(-50%, 0);
+    }
+
+    @else if $p=="abs-mid" {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        -webkit-transform: translate(-50%, -50%);
+    }
+
+    @else if $p=="mid-flex" {
+        display: -webkit-flex;
+        display: flex;
+        align-items: center;
+        -webkit-align-items: center;
+        justify-content: center;
+        -webkit-justify-content: center;
+    }
+
+    @else if $p=="mid-block" {
+        margin: 0 auto;
+        display: block;
+    }
+}
+
+@mixin hover-global {
+    @include hover {
+        color: var(--white);
+    }
+}
+
+@mixin hover($value: 1025px) {
+    &:hover {
+        @media screen and (min-width: $value) {
+            @content;
+        }
+    }
+}
+
+
+@mixin circle($circle: 100%) {
+    width: $circle;
+    height: $circle;
+    border-radius: 100rem;
+    flex-shrink: 0;
+}
+
+@mixin reset-input {
+    background-color: transparent;
+    width: 100%;
+    font-family: var(--font-pri);
+    border: none;
+    outline: none;
+}
+
+@mixin item-shrink($size) {
+    width: $size;
+    height: $size;
+    flex-shrink: 0;
+    display: inline-block;
+}
+
+@mixin affter($color: var(--color-pri)) {
+    &::after {
+        position: absolute;
+        content: "";
+        width: 0;
+        height: 100%;
+        top: 0;
+        right: 0;
+        background: $color;
+        transition: all 0.4s ease;
+        z-index: 1;
+        pointer-events: none;
+    }
+}
+
+@mixin hoverAffter {
+    @include hover {
+        &::after {
+            left: 0;
+            width: 100%;
+        }
+    }
+}
+
+@mixin mask($url) {
+    mask-image: $url;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+    -webkit-mask-image: $url;
+    -webkit-mask-position: center;
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+}
+
+@mixin colorLinearPri() {
+    background: var(--linear-pri);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    @include transition(.3s, ease);
+}

@@ -1,0 +1,108 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 1. Quản lý Tài khoản (Admin/Nhân viên)
+model Employee {
+  id        String   @id @default(uuid())
+  name      String
+  avatar    String?  // Lưu link URL từ AWS S3
+  position  String   // Vị trí: Quản lý, Nhân viên bếp, Phục vụ...
+  salary    Float
+  startDate DateTime @default(now()) // Tính thâm niên
+  createdAt DateTime @default(now())
+}
+
+// 2. Quản lý Bàn
+model Table {
+  id          String   @id @default(uuid())
+  tableNumber String   @unique
+  qrCodeUrl   String   // Link ảnh QR code
+  status      String   @default("AVAILABLE") // AVAILABLE, OCCUPIED
+  orders      Order[]
+}
+
+// 3. Quản lý Món ăn & Danh mục
+model Category {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  products Product[]
+}
+
+model Product {
+  id          String      @id @default(uuid())
+  name        String
+  thumbnail   String      // Lưu link URL từ AWS S3
+  price       Float
+  isAvailable Boolean     @default(true)
+  categoryId  String
+  category    Category    @relation(fields: [categoryId], references: [id])
+  orderItems  OrderItem[]
+  comboItems  ComboItem[] // Mối quan hệ với các Combo
+}
+
+// 4. Cấu trúc Combo (Cho phần AI và Admin quản lý)
+model Combo {
+  id          String      @id @default(uuid())
+  name        String
+  price       Float       // Giá đặc biệt của combo
+  thumbnail   String
+  isActive    Boolean     @default(true)
+  comboItems  ComboItem[]
+}
+
+model ComboItem {
+  id        String  @id @default(uuid())
+  comboId   String
+  productId String
+  quantity  Int     @default(1)
+  combo     Combo   @relation(fields: [comboId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+// 5. Quản lý Đơn hàng (Cốt lõi Real-time)
+model Order {
+  id            String      @id @default(uuid())
+  tableId       String
+  table         Table       @relation(fields: [tableId], references: [id])
+  totalPrice    Float
+  status        String      @default("PENDING") // PENDING, COOKING, COMPLETED, CANCELLED
+  paymentStatus String      @default("UNPAID")  // UNPAID, PAID
+  createdAt     DateTime    @default(now())     // Dùng cho Dashboard Theo Ngày/Giờ/Tuần/Tháng
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  note      String? // Ít cay, không hành...
+}
+
+// 6. Quản lý Chi tiêu của Quán (Spending)
+model Spending {
+  id        String   @id @default(uuid())
+  title     String
+  image     String?
+  tag       String   // Tiền điện, Tiền nước, Nhập hàng...
+  amount    Float
+  createdAt DateTime @default(now())
+}
+
+// 7. Quản lý Góp ý (Opinion - Phục vụ Big Data cho AI)
+model Opinion {
+  id        String   @id @default(uuid())
+  gender    String   // MALE, FEMALE, OTHER
+  birthYear Int
+  content   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

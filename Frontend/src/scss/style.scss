@@ -1,0 +1,10 @@
+// Core
+@use "./core" as *;
+
+// components
+@use "./components/header" as *;
+@use "./components/footer" as *;
+@use "./components/mobile" as *;
+@use "./components/search" as *;
+@use "./components/hambuger" as *;
+@use "./components/childpages" as *;

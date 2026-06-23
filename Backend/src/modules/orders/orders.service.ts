@@ -70,9 +70,33 @@ export class OrderService {
   }
 
   async createOrder(orderData: any): Promise<Order> {
+    let finalTableId = orderData.tableId
+
+    // Fallback if tableId is missing or invalid in DB
+    if (!finalTableId) {
+      const firstTable = await this.prismaService.table.findFirst()
+      if (firstTable) {
+        finalTableId = firstTable.id
+      }
+    } else {
+      const tableExists = await this.prismaService.table.findUnique({
+        where: { id: finalTableId }
+      })
+      if (!tableExists) {
+        const firstTable = await this.prismaService.table.findFirst()
+        if (firstTable) {
+          finalTableId = firstTable.id
+        }
+      }
+    }
+
+    if (!finalTableId) {
+      throw new Error("No tables available in the database to assign this order to.")
+    }
+
     const dbOrder = await this.prismaService.order.create({
       data: {
-        tableId: orderData.tableId,
+        tableId: finalTableId,
         totalPrice: Number(orderData.totalPrice),
         status: getStatusString(orderData.status),
         paymentStatus: getPaymentStatusString(orderData.paymentStatus),

@@ -1,0 +1,110 @@
+import { Search, BookText, MessageCircle, XCircle } from "lucide-react"
+import { Link } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { Input } from "@/components/ui/input"
+import useFetch from "@/hooks/useFetch"
+import { Skeleton } from "@/components/ui/skeleton"
+import Error from "@/components/ui/error"
+
+interface HeaderProps {
+  activeCategoryId?: string
+  onCategoryClick?: (id: string) => void
+}
+
+const Header = ({ activeCategoryId, onCategoryClick }: HeaderProps) => {
+  const { data: categories, isPending, error } = useFetch({ url: "http://localhost:3000/categories", key: ["categories"] })
+  const [toggle, setToggle] = useState(false)
+
+  const handleToggle = () => {
+    setToggle(prev => !prev)
+  }
+
+  useEffect(() => {
+    if (activeCategoryId) {
+      const activeElement = document.getElementById(`header-cate-${activeCategoryId}`)
+      if (activeElement) {
+        activeElement.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+          inline: "center"
+        })
+      }
+    }
+  }, [activeCategoryId])
+
+  return (
+    <header className="header sticky z-50 top-0 left-0 w-full mb-6">
+      {/* header main */}
+      <div className="header-in rounded-b-4xl bg-blue-600">
+        <div className="container">
+          <div className="header-wrap h-full flex flex-col gap-y-4 py-6">
+            <span className="font-semibold uppercase text-3xl text-white">bàn 10</span>
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={handleToggle}
+                className={`${toggle ? "hidden" : "flex"} p-4 bg-white flex items-center justify-center rounded-2xl w-[4.8rem] h-[4.8rem] max-md:h-[4rem]`}
+              >
+                <Search size={24} />
+              </button>
+              <div
+                className={`${toggle ? "hidden" : "flex"} items-center gap-4 p-6 bg-white flex items-center justify-center 
+                rounded-2xl w-full h-[4.8rem] max-md:h-[4rem]`}
+              >
+                <Link to="/gop-y" className="flex-1 flex items-center gap-2 max-sm:justify-center">
+                  <MessageCircle size={20} />
+                  <span>Góp ý</span>
+                </Link>
+                |
+                <Link to="/gio-hang" className="flex-1 flex items-center gap-2 max-sm:justify-center">
+                  <BookText size={20} />
+                  <span>Món đã gọi</span>
+                </Link>
+              </div>
+              <div className={`w-full items-center gap-4 ${toggle ? "flex" : "hidden"}`}>
+                <Input
+                  type="search"
+                  placeholder="Tìm kiếm..."
+                  className="w-full h-[4.8rem] max-md:h-[4rem] px-4 py-6 bg-white rounded-2xl"
+                />
+                <button type="button" onClick={handleToggle}>
+                  <XCircle className="text-white" size={30} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* categories */}
+      <div className="header-cate overflow-hidden py-6 border-b border-gray-3 bg-white">
+        <div className="container">
+          <div className="flex flex-nowrap gap-4 overflow-x-auto no-scrollbar max-md:gap-2">
+            {isPending ? (
+              Array.from({ length: 5 }).map((_, index) => <Skeleton className="w-[20rem] h-[4.8rem] rounded-full" key={index} />)
+            ) : error ? (
+              <Error />
+            ) : (
+              categories?.data?.map(category => (
+                <button
+                  key={category.id}
+                  id={`header-cate-${category.id}`}
+                  type="button"
+                  onClick={() => onCategoryClick?.(category.id)}
+                  className={`w-fit uppercase py-3 px-6 rounded-full text-2xl transition-all duration-300 whitespace-nowrap border ${
+                    activeCategoryId === category.id
+                      ? "bg-blue-600 text-white border-blue-600 font-semibold"
+                      : "bg-white text-gray-700 border-gray-400 font-normal hover:text-blue-600 hover:border-blue-600"
+                  }`}
+                >
+                  <span>{category.categoryName}</span>
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    </header>
+  )
+}
+
+export default Header

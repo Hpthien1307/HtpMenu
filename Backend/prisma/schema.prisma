@@ -25,6 +25,7 @@ model Table {
   qrCodeUrl   String   // Link ảnh QR code
   status      String   @default("AVAILABLE") // AVAILABLE, OCCUPIED
   orders      Order[]
+  carts       Cart[]
 }
 
 // 3. Quản lý Món ăn & Danh mục
@@ -44,6 +45,7 @@ model Product {
   category    Category    @relation(fields: [categoryId], references: [id])
   orderItems  OrderItem[]
   comboItems  ComboItem[] // Mối quan hệ với các Combo
+  carts       Cart[]
 }
 
 // 4. Cấu trúc Combo (Cho phần AI và Admin quản lý)
@@ -105,4 +107,20 @@ model Opinion {
   content   String
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+// 8. Quản lý Giỏ hàng (Cart)
+model Cart {
+  id        String   @id @default(uuid())
+  tableId   String
+  productId String
+  quantity  Int      @default(1)
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  table     Table    @relation(fields: [tableId], references: [id], onDelete: Cascade)
+
+  @@unique([tableId, productId])
 }

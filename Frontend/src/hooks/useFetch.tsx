@@ -5,7 +5,7 @@ interface UseQueryProps {
   key: string[]
 }
 
-const useQueryCustom = ({ url, key }: UseQueryProps) => {
+const useFetch = ({ url, key }: UseQueryProps) => {
   return useQuery({
     queryKey: key,
     queryFn: async () => {
@@ -19,4 +19,4 @@ const useQueryCustom = ({ url, key }: UseQueryProps) => {
   })
 }
 
-export default useQueryCustom
+export default useFetch

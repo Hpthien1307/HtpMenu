@@ -14,7 +14,7 @@ export class TablesController {
       return new ResponseData(data, HttpStatus.OK, HttpMessage.SUCCESS)
     } catch (error: any) {
       console.error("Error getting all tables", error)
-      return new ResponseData(null, HttpStatus.INTERNAL_SERVER_ERROR, error.message || HttpMessage.ERROR)
+      return new ResponseData(null, HttpStatus.INTERNAL_SERVER_ERROR, error.message || HttpMessage.NOT_FOUND)
     }
   }
 

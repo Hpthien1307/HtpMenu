@@ -113,7 +113,7 @@ const Cart = () => {
       }, 1000)
     } catch (error) {
       console.error("Lỗi đặt món:", error)
-      showToast.error(error.message || "Đặt món thất bại. Vui lòng thử lại!")
+      showToast.error("Đặt món thất bại. Vui lòng thử lại!")
     } finally {
       setIsSubmitting(false)
     }

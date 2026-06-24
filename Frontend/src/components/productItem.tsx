@@ -41,8 +41,10 @@ export const ProductsItem = ({ product }: ProductItemProps) => {
         <div className="wrap-content w-full p-4">
           <div className="flex flex-col justify-between gap-4 h-full">
             <span className="text-3xl max-md:text-2xl capitalize line-clamp-2">{product.productName || "tên sản phẩm đang cập nhật"}</span>
-            <div className=" max-w-full flex justify-between items-end gap-4 flex-wrap">
-              <div className="text-3xl font-medium max-md:text-2xl">{FormatPrice(product.price) || "giá đang được cập nhật"}</div>
+            <div className="max-w-full flex justify-between items-end gap-4 flex-wrap">
+              <div className="text-3xl font-medium max-md:text-2xl">
+                {typeof product.price === "number" ? FormatPrice(product.price) : "giá đang được cập nhật"}
+              </div>
               <Quantity productId={product.id} />
             </div>
           </div>

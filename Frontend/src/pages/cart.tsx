@@ -38,21 +38,22 @@ const Cart = () => {
     key: ["combos"]
   })
 
-  const mergedProducts = products?.data && combos?.data
-    ? [
-        ...products.data,
-        ...combos.data.map((combo: any) => ({
-          id: combo.id,
-          productName: combo.comboName,
-          price: combo.price,
-          thumbnail: combo.thumbnail,
-          isActive: combo.isActive,
-          categoryId: "combo-category-id"
-        }))
-      ]
-    : products?.data || [];
+  const mergedProducts =
+    products?.data && combos?.data
+      ? [
+          ...products.data,
+          ...combos.data.map((combo: ProductProps) => ({
+            id: combo.id,
+            productName: combo.productName,
+            price: combo.price,
+            thumbnail: combo.thumbnail,
+            isActive: combo.isActive,
+            categoryId: "combo-category-id"
+          }))
+        ]
+      : products?.data || []
 
-  const cartProducts = mergedProducts.filter(product => cart[product.id]) || []
+  const cartProducts = mergedProducts.filter((product: ProductProps) => cart[product.id]) || []
   const totalProductsPrice = cartProducts.reduce(
     (sum: number, product: ProductProps) => sum + (product.price || 0) * (cart[product.id] || 0),
     0
@@ -110,7 +111,7 @@ const Cart = () => {
       setTimeout(() => {
         navigate("/")
       }, 1000)
-    } catch (error: any) {
+    } catch (error) {
       console.error("Lỗi đặt món:", error)
       showToast.error(error.message || "Đặt món thất bại. Vui lòng thử lại!")
     } finally {
@@ -147,7 +148,9 @@ const Cart = () => {
                       ) : cartProducts.length === 0 ? (
                         <p className="text-center text-gray-500 py-12">Giỏ hàng đang trống</p>
                       ) : (
-                        cartProducts.map(product => <ProductsItem key={product.id} product={{ ...product, layout: "list" }} />)
+                        cartProducts.map((product: ProductProps) => (
+                          <ProductsItem key={product.id} product={{ ...product, layout: "list" }} />
+                        ))
                       )}
                     </div>
                   </div>

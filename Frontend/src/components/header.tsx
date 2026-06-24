@@ -57,7 +57,7 @@ const Header = ({ activeCategoryId, onCategoryClick }: HeaderProps) => {
 
     if (currentTableId && isUuid) {
       localStorage.setItem("tableId", currentTableId)
-      fetch(`http://localhost:3000/tables/${currentTableId}`)
+      fetch(`${API_URL}/tables/${currentTableId}`)
         .then(res => res.json())
         .then(resData => {
           if (resData && resData.data && resData.data.tableNumber) {
@@ -71,7 +71,7 @@ const Header = ({ activeCategoryId, onCategoryClick }: HeaderProps) => {
         })
     } else {
       // Fallback: Fetch all tables and default to "Bàn 10" or the first available table
-      fetch("http://localhost:3000/tables")
+      fetch(`${API_URL}/tables`)
         .then(res => res.json())
         .then(resData => {
           if (resData && resData.data && resData.data.length > 0) {

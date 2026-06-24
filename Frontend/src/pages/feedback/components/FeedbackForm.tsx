@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { API_URL } from "@/config/environment"
 
 export const FeedbackForm = () => {
   const {
@@ -28,7 +29,7 @@ export const FeedbackForm = () => {
   const onSubmit = async (data: FeedbackFormInput) => {
     try {
       // Gọi API gửi góp ý
-      const res = await fetch("http://localhost:3000/opinions", {
+      const res = await fetch(`${API_URL}/opinions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

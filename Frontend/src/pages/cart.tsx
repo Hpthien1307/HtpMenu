@@ -4,13 +4,15 @@ import WrapperMain from "@/components/wrapperMain"
 import useFetch from "@/hooks/useFetch"
 import { useCart } from "@/hooks/useCart"
 import { Skeleton } from "@/components/ui/skeleton"
-import Error from "@/components/ui/error"
+import ErrorView from "@/components/ui/error"
 import { ProductsItem } from "@/components/productItem"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { FormatPrice } from "@/utils/formatters."
 import { useState } from "react"
 import { showToast } from "@/utils/showToasts"
+import { Spinner } from "@/components/ui/spinner"
+import type { ProductProps } from "@/components/productItem"
 
 const Cart = () => {
   const { cart, cartItemCount, clearCart } = useCart()
@@ -27,11 +29,37 @@ const Cart = () => {
     key: ["products"]
   })
 
-  const cartProducts = products?.data?.filter(product => cart[product.id]) || []
-  const totalProductsPrice = cartProducts.reduce((sum, product) => sum + (product.price || 0) * (cart[product.id] || 0), 0)
+  const {
+    data: combos,
+    isPending: isPendingCombos,
+    error: errorCombos
+  } = useFetch({
+    url: "http://localhost:3000/products/combos",
+    key: ["combos"]
+  })
+
+  const mergedProducts = products?.data && combos?.data
+    ? [
+        ...products.data,
+        ...combos.data.map((combo: any) => ({
+          id: combo.id,
+          productName: combo.comboName,
+          price: combo.price,
+          thumbnail: combo.thumbnail,
+          isActive: combo.isActive,
+          categoryId: "combo-category-id"
+        }))
+      ]
+    : products?.data || [];
+
+  const cartProducts = mergedProducts.filter(product => cart[product.id]) || []
+  const totalProductsPrice = cartProducts.reduce(
+    (sum: number, product: ProductProps) => sum + (product.price || 0) * (cart[product.id] || 0),
+    0
+  )
   const totalPrice = totalProductsPrice
-  const isPending = isPendingProducts
-  const error = errorProducts
+  const isPending = isPendingProducts || isPendingCombos
+  const error = errorProducts || errorCombos
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -47,7 +75,7 @@ const Cart = () => {
 
     setIsSubmitting(true)
     try {
-      const orderItems = cartProducts.map(product => ({
+      const orderItems = cartProducts.map((product: ProductProps) => ({
         productId: product.id,
         quantity: cart[product.id] || 1,
         note: note || undefined
@@ -68,16 +96,23 @@ const Cart = () => {
       })
 
       if (!res.ok) {
-        throw new Error("Đặt món thất bại")
+        throw new Error("Không thể kết nối đến máy chủ.")
+      }
+
+      const resData = await res.json()
+      if (resData.statusCode !== 200 && resData.statusCode !== 201) {
+        throw new Error(resData.message || "Đặt món thất bại.")
       }
 
       showToast.success("Đặt món thành công! Vui lòng đợi trong giây lát.")
       clearCart()
       setNote("")
-      navigate("/")
-    } catch (error) {
+      setTimeout(() => {
+        navigate("/")
+      }, 1000)
+    } catch (error: any) {
       console.error("Lỗi đặt món:", error)
-      showToast.error("Đặt món thất bại. Vui lòng thử lại!")
+      showToast.error(error.message || "Đặt món thất bại. Vui lòng thử lại!")
     } finally {
       setIsSubmitting(false)
     }
@@ -108,7 +143,7 @@ const Cart = () => {
                       {isPending ? (
                         Array.from({ length: 5 }).map((_, index) => <Skeleton className="w-full h-[12rem] rounded-2xl" key={index} />)
                       ) : error ? (
-                        <Error />
+                        <ErrorView />
                       ) : cartProducts.length === 0 ? (
                         <p className="text-center text-gray-500 py-12">Giỏ hàng đang trống</p>
                       ) : (
@@ -136,6 +171,7 @@ const Cart = () => {
                   <span className="font-semibold">{FormatPrice(totalPrice || 0)}</span>
                 </div>
                 <Button type="submit" disabled={isSubmitting || cartItemCount === 0}>
+                  {isSubmitting && <Spinner />}
                   <span>{isSubmitting ? "Đang xử lý..." : "Xác nhận"}</span>
                 </Button>
               </div>

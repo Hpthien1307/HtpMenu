@@ -4,6 +4,7 @@ import { Order } from "@/models/orders.model"
 import { HttpMessage } from "@/global/globalEnum"
 import { HttpStatus } from "@/global/globalEnum"
 import { ResponseData } from "@/global/globalClass"
+import { OrderDto } from "@/dto/orders.dto"
 
 @Controller("orders")
 export class OrderController {
@@ -21,9 +22,9 @@ export class OrderController {
   }
 
   @Post()
-  async createOrder(@Body() order: any): Promise<ResponseData<Order>> {
+  async createOrder(@Body() orderDto: OrderDto): Promise<ResponseData<Order>> {
     try {
-      const data = await this.orderService.createOrder(order)
+      const data = await this.orderService.createOrder(orderDto)
       return new ResponseData<Order>(data, HttpStatus.OK, HttpMessage.SUCCESS)
     } catch (error) {
       console.log("Error create order", error)
@@ -43,9 +44,9 @@ export class OrderController {
   }
 
   @Put(":id")
-  async updateOrder(@Param("id") id: string, @Body() order: Partial<Order>): Promise<ResponseData<Order>> {
+  async updateOrder(@Param("id") id: string, @Body() orderDto: Partial<OrderDto>): Promise<ResponseData<Order>> {
     try {
-      const data = await this.orderService.updateOrder(id, order)
+      const data = await this.orderService.updateOrder(id, orderDto)
       return new ResponseData<Order>(data, HttpStatus.OK, HttpMessage.SUCCESS)
     } catch (error) {
       console.log("Error update order", error)

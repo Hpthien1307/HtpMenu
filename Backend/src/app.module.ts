@@ -9,6 +9,7 @@ import { CategoriesModule } from '@/modules/categories/categories.module';
 import { EmployeesModule } from '@/modules/employees/employees.module';
 import { OpinionsModule } from '@/modules/opinions/opinions.module';
 import { CartModule } from '@/modules/cart/cart.module';
+import { TablesModule } from '@/modules/tables/tables.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { CartModule } from '@/modules/cart/cart.module';
     EmployeesModule,
     OpinionsModule,
     CartModule,
+    TablesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

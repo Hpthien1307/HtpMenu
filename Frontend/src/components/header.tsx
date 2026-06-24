@@ -1,5 +1,5 @@
 import { Search, BookText, MessageCircle, XCircle } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import { useState, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import useFetch from "@/hooks/useFetch"
@@ -12,8 +12,25 @@ interface HeaderProps {
 }
 
 const Header = ({ activeCategoryId, onCategoryClick }: HeaderProps) => {
-  const { data: categories, isPending, error } = useFetch({ url: "http://localhost:3000/categories", key: ["categories"] })
+  const {
+    data: categories,
+    isPending: isPendingCategories,
+    error: errorCategories
+  } = useFetch({ url: "http://localhost:3000/categories", key: ["categories"] })
+  const {
+    data: combos,
+    isPending: isPendingCombos,
+    error: errorCombos
+  } = useFetch({ url: "http://localhost:3000/products/combos", key: ["combos"] })
   const [toggle, setToggle] = useState(false)
+
+  const isPending = isPendingCategories || isPendingCombos
+  const error = errorCategories || errorCombos
+
+  const mergedCategories =
+    categories?.data && combos?.data && combos.data.length > 0
+      ? [...categories.data, { id: "combo-category-id", categoryName: "Combo" }]
+      : categories?.data || []
 
   const handleToggle = () => {
     setToggle(prev => !prev)
@@ -32,13 +49,59 @@ const Header = ({ activeCategoryId, onCategoryClick }: HeaderProps) => {
     }
   }, [activeCategoryId])
 
+  const { tableId: routeTableId } = useParams()
+  const [tableNumber, setTableNumber] = useState("...")
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const currentTableId = params.get("tableId") || routeTableId || localStorage.getItem("tableId")
+
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(currentTableId || "")
+
+    if (currentTableId && isUuid) {
+      localStorage.setItem("tableId", currentTableId)
+      fetch(`http://localhost:3000/tables/${currentTableId}`)
+        .then(res => res.json())
+        .then(resData => {
+          if (resData && resData.data && resData.data.tableNumber) {
+            setTableNumber(resData.data.tableNumber)
+          } else {
+            setTableNumber(currentTableId)
+          }
+        })
+        .catch(() => {
+          setTableNumber("...")
+        })
+    } else {
+      // Fallback: Fetch all tables and default to "Bàn 10" or the first available table
+      fetch("http://localhost:3000/tables")
+        .then(res => res.json())
+        .then(resData => {
+          if (resData && resData.data && resData.data.length > 0) {
+            const table10 = resData.data.find((t: any) => t.tableNumber.includes("10"))
+            const fallbackTable = table10 || resData.data[0]
+
+            localStorage.setItem("tableId", fallbackTable.id)
+            setTableNumber(fallbackTable.tableNumber)
+          } else {
+            setTableNumber("Chưa chọn bàn")
+          }
+        })
+        .catch(() => {
+          setTableNumber("Chưa chọn bàn")
+        })
+    }
+  }, [routeTableId])
+
   return (
     <header className="header sticky z-50 top-0 left-0 w-full mb-6">
       {/* header main */}
       <div className="header-in rounded-b-4xl bg-blue-600">
         <div className="container">
           <div className="header-wrap h-full flex flex-col gap-y-4 py-6">
-            <span className="font-semibold uppercase text-3xl text-white">bàn 10</span>
+            <span className="font-semibold uppercase text-3xl text-white">
+              {tableNumber.toLowerCase().startsWith("bàn") ? tableNumber : `bàn ${tableNumber}`}
+            </span>
             <div className="flex items-center gap-4">
               <button
                 type="button"
@@ -84,7 +147,7 @@ const Header = ({ activeCategoryId, onCategoryClick }: HeaderProps) => {
             ) : error ? (
               <Error />
             ) : (
-              categories?.data?.map(category => (
+              mergedCategories?.map((category: any) => (
                 <button
                   key={category.id}
                   id={`header-cate-${category.id}`}

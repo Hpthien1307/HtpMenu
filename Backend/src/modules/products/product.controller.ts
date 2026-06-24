@@ -2,7 +2,7 @@ import { Controller, Get, Post, Put, Delete, Param, Body } from "@nestjs/common"
 import { ProductService } from "@/modules/products/product.service"
 import { ResponseData } from "@/global/globalClass"
 import { HttpMessage, HttpStatus } from "@/global/globalEnum"
-import { Product } from "@/models/products.model"
+import { Product, Combo } from "@/models/products.model"
 import { ProductDto } from "@/dto/product.dto"
 
 @Controller("products")
@@ -20,14 +20,30 @@ export class ProductController {
     }
   }
 
-  @Post()
-  async createProduct(@Body() productDto: ProductDto): Promise<ResponseData<Product>> {
+  @Get("combos")
+  async getCombos(): Promise<ResponseData<Combo[]>> {
     try {
-      const data = await this.productService.createProduct(productDto)
-      return new ResponseData<Product>(data, HttpStatus.OK, HttpMessage.SUCCESS)
+      const data = await this.productService.getCombos()
+      return new ResponseData<Combo[]>(data, HttpStatus.OK, HttpMessage.SUCCESS)
     } catch (error) {
-      console.error("Error creating product", error)
-      return new ResponseData<Product>(null, HttpStatus.NOT_FOUND, HttpMessage.NOT_FOUND)
+      console.error("Error getting combos", error)
+      return new ResponseData<Combo[]>(null, HttpStatus.INTERNAL_SERVER_ERROR, HttpMessage.INTERNAL_SERVER_ERROR)
+    }
+  }
+
+  @Post()
+  async createProduct(@Body() body: ProductDto | ProductDto[]): Promise<ResponseData<Product | Product[]>> {
+    try {
+      if (Array.isArray(body)) {
+        const data = await this.productService.createManyProducts(body)
+        return new ResponseData<Product[]>(data, HttpStatus.OK, HttpMessage.SUCCESS)
+      } else {
+        const data = await this.productService.createProduct(body)
+        return new ResponseData<Product>(data, HttpStatus.OK, HttpMessage.SUCCESS)
+      }
+    } catch (error) {
+      console.error("Error creating product(s)", error)
+      return new ResponseData(null, HttpStatus.BAD_REQUEST, error.message || HttpMessage.NOT_FOUND)
     }
   }
 

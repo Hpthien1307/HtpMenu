@@ -71,9 +71,10 @@ export class OrderService {
 
   async createOrder(orderData: any): Promise<Order> {
     let finalTableId = orderData.tableId
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(finalTableId || "")
 
-    // Fallback if tableId is missing or invalid in DB
-    if (!finalTableId) {
+    // Fallback if tableId is missing or invalid UUID format
+    if (!finalTableId || !isUuid) {
       const firstTable = await this.prismaService.table.findFirst()
       if (firstTable) {
         finalTableId = firstTable.id
@@ -94,6 +95,33 @@ export class OrderService {
       throw new Error("No tables available in the database to assign this order to.")
     }
 
+    // Resolve items (handling combos by expanding them)
+    const itemsToCreate = []
+    for (const item of orderData.items || []) {
+      const combo = await this.prismaService.combo.findUnique({
+        where: { id: item.productId },
+        include: {
+          comboItems: true
+        }
+      })
+
+      if (combo) {
+        for (const comboItem of combo.comboItems) {
+          itemsToCreate.push({
+            productId: comboItem.productId,
+            quantity: Number(item.quantity) * comboItem.quantity,
+            note: `[Combo: ${combo.name}]${item.note ? ` - ${item.note}` : ""}`
+          })
+        }
+      } else {
+        itemsToCreate.push({
+          productId: item.productId,
+          quantity: Number(item.quantity),
+          note: item.note
+        })
+      }
+    }
+
     const dbOrder = await this.prismaService.order.create({
       data: {
         tableId: finalTableId,
@@ -102,11 +130,7 @@ export class OrderService {
         paymentStatus: getPaymentStatusString(orderData.paymentStatus),
         createdAt: orderData.createdAt ? new Date(orderData.createdAt) : new Date(),
         items: {
-          create: (orderData.items || []).map((item: any) => ({
-            productId: item.productId,
-            quantity: Number(item.quantity),
-            note: item.note
-          }))
+          create: itemsToCreate
         }
       },
       include: {

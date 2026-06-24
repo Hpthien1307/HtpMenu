@@ -3,6 +3,7 @@ import { SpendingService } from "@/modules/spending/spending.service"
 import { Spending } from "@/models/spending.model"
 import { ResponseData } from "@/global/globalClass"
 import { HttpMessage } from "@/global/globalEnum"
+import { SpendingDto } from "@/dto/spending.dto"
 
 @Controller("spendings")
 export class SpendingContollers {
@@ -31,9 +32,9 @@ export class SpendingContollers {
   }
 
   @Post()
-  async addSpending(@Body() spending: Spending): Promise<ResponseData<Spending>> {
+  async addSpending(@Body() spendingDto: SpendingDto): Promise<ResponseData<Spending>> {
     try {
-      const data = await this.spendingService.addSpending(spending)
+      const data = await this.spendingService.addSpending(new Spending(spendingDto))
       return new ResponseData<Spending>(data, HttpStatus.OK, HttpMessage.SUCCESS)
     } catch (error) {
       console.error("Error adding spending", error)
@@ -42,12 +43,12 @@ export class SpendingContollers {
   }
 
   @Put("/:id")
-  async updateSpending(@Param("id") id: string, @Body() spending: Partial<Spending>): Promise<ResponseData<Spending>> {
+  async updateSpending(@Param("id") id: string, @Body() spendingDto: Partial<SpendingDto>): Promise<ResponseData<Spending>> {
     try {
-      const data = await this.spendingService.updateSpending(id, spending)
+      const data = await this.spendingService.updateSpending(id, new Spending(spendingDto))
       return new ResponseData<Spending>(data, HttpStatus.OK, HttpMessage.SUCCESS)
     } catch (error) {
-      console.error("Error updating spending", error)
+      console.log("Error updating spending", error)
       return new ResponseData<Spending>(null, HttpStatus.NOT_FOUND, HttpMessage.NOT_FOUND)
     }
   }

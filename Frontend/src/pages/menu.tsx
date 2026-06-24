@@ -6,12 +6,13 @@ import { Skeleton } from "@/components/ui/skeleton"
 import Error from "@/components/ui/error"
 import { ProductsItem, type ProductProps } from "@/components/productItem"
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import { FormatPrice } from "@/utils/formatters."
 import { useCart } from "@/hooks/useCart"
 
 const Menu = () => {
-  const [displayMode, setDisplayMode] = useState("list")
+  const { tableId: routeTableId } = useParams()
+  const [displayMode, setDisplayMode] = useState<"list" | "grid">("list")
   const [activeCategoryId, setActiveCategoryId] = useState("")
   const { cart, cartItemCount } = useCart()
 
@@ -37,21 +38,58 @@ const Menu = () => {
     key: ["categories"]
   })
 
+  const {
+    data: combos,
+    isPending: isPendingCombos,
+    error: errorCombos
+  } = useFetch({
+    url: "http://localhost:3000/products/combos",
+    key: ["combos"]
+  })
+
+  const mergedCategories =
+    categories?.data && combos?.data && combos.data.length > 0
+      ? [...categories.data, { id: "combo-category-id", categoryName: "Combo" }]
+      : categories?.data || []
+
+  const mergedProducts =
+    products?.data && combos?.data
+      ? [
+          ...products.data,
+          ...combos.data.map((combo: any) => ({
+            id: combo.id,
+            productName: combo.comboName,
+            price: combo.price,
+            thumbnail: combo.thumbnail,
+            isActive: combo.isActive,
+            categoryId: "combo-category-id"
+          }))
+        ]
+      : products?.data || []
+
   useEffect(() => {
-    if (categories?.data && categories.data.length > 0 && !activeCategoryId) {
-      setActiveCategoryId(categories.data[0].id)
+    const params = new URLSearchParams(window.location.search)
+    const tableId = params.get("tableId") || routeTableId
+    if (tableId) {
+      localStorage.setItem("tableId", tableId)
     }
-  }, [categories, activeCategoryId])
+  }, [routeTableId])
+
+  useEffect(() => {
+    if (mergedCategories && mergedCategories.length > 0 && !activeCategoryId) {
+      setActiveCategoryId(mergedCategories[0].id)
+    }
+  }, [mergedCategories, activeCategoryId])
 
   useEffect(() => {
     const handleScroll = () => {
-      if (!categories?.data || categories.data.length === 0) return
+      if (!mergedCategories || mergedCategories.length === 0) return
 
       const header = document.querySelector(".header")
       const threshold = (header ? header.clientHeight : -580) + 100
-      let currentActiveId = categories.data[0].id
+      let currentActiveId = mergedCategories[0].id
 
-      for (const category of categories.data) {
+      for (const category of mergedCategories) {
         const element = document.getElementById(`category-${category.id}`)
         if (element) {
           const rect = element.getBoundingClientRect()
@@ -68,7 +106,7 @@ const Menu = () => {
     handleScroll()
 
     return () => window.removeEventListener("scroll", handleScroll)
-  }, [categories])
+  }, [mergedCategories])
 
   const handleCategoryClick = (id: string) => {
     const element = document.getElementById(`category-${id}`)
@@ -86,13 +124,13 @@ const Menu = () => {
   }
 
   const totalPrice =
-    (products?.data as ProductProps[] | undefined)?.reduce((sum: number, product) => {
+    (mergedProducts as ProductProps[] | undefined)?.reduce((sum: number, product) => {
       const qty = cart[product.id] || 0
       return sum + qty * (product.price || 0)
     }, 0) || 0
 
-  const isPending = isPendingProducts || isPendingCategories
-  const error = errorProducts || errorCategories
+  const isPending = isPendingProducts || isPendingCategories || isPendingCombos
+  const error = errorProducts || errorCategories || errorCombos
 
   return (
     <WrapperMain classCustom="page-menu">
@@ -107,7 +145,7 @@ const Menu = () => {
               <div className="menu-main__header pb-6 border-b border-gray-200 flex justify-between gap-2 items-center">
                 <p>
                   Tất cả
-                  <span className="font-semibold"> {products?.data?.length || 0} </span>
+                  <span className="font-semibold"> {mergedProducts?.length || 0} </span>
                   món
                 </p>
                 <div className="inline-flex items-center gap-4 rounded-full bg-gray-100 py-3 px-6">
@@ -127,8 +165,8 @@ const Menu = () => {
                   ) : error ? (
                     <Error />
                   ) : (
-                    categories?.data?.map(category => {
-                      const categoryProducts = products?.data?.filter(product => product.categoryId === category.id) || []
+                    mergedCategories?.map((category: any) => {
+                      const categoryProducts = mergedProducts?.filter((product: ProductProps) => product.categoryId === category.id) || []
 
                       if (categoryProducts.length === 0) return null
 
@@ -139,7 +177,7 @@ const Menu = () => {
                             <span> ({categoryProducts?.length})</span>
                           </h3>
                           <div className={`${displayMode === "list" ? "flex flex-col" : "grid grid-cols-2"} gap-6`}>
-                            {categoryProducts.map(product => (
+                            {categoryProducts.map((product: ProductProps) => (
                               <ProductsItem key={product.id} product={{ ...product, layout: displayMode }} />
                             ))}
                           </div>

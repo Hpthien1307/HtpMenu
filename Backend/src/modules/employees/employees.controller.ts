@@ -3,6 +3,7 @@ import { EmployeesService } from "@/modules/employees/employees.service";
 import { ResponseData } from "@/global/globalClass";
 import { HttpMessage, HttpStatus } from "@/global/globalEnum";
 import { Employee } from "@/models/employees.model";
+import { EmployeeDto } from "@/dto/employees.dto";
 
 @Controller("employees")
 export class EmployeesController {
@@ -24,9 +25,9 @@ export class EmployeesController {
   }
 
   @Post()
-  async createEmployee(@Body() employee: Employee): Promise<ResponseData<Employee>> {
+  async createEmployee(@Body() employeeDto: EmployeeDto): Promise<ResponseData<Employee>> {
     try {
-      const data = await this.employeesService.createEmployee(employee);
+      const data = await this.employeesService.createEmployee(new Employee(employeeDto));
       return new ResponseData<Employee>(
         data,
         HttpStatus.OK,
@@ -56,10 +57,10 @@ export class EmployeesController {
   @Put("/:id")
   async updateEmployee(
     @Param("id") id: string,
-    @Body() employee: Partial<Employee>
+    @Body() employeeDto: Partial<EmployeeDto>
   ): Promise<ResponseData<Employee>> {
     try {
-      const data = await this.employeesService.updateEmployee(id, employee);
+      const data = await this.employeesService.updateEmployee(id, new Employee(employeeDto));
       return new ResponseData<Employee>(
         data,
         HttpStatus.OK,

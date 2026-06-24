@@ -24,6 +24,34 @@ export class ProductService {
     return products.map(mapProduct)
   }
 
+  async getCombos(): Promise<any[]> {
+    const combos = await this.prismaService.combo.findMany({
+      include: {
+        comboItems: {
+          include: {
+            product: true
+          }
+        }
+      }
+    })
+    return combos.map(dbCombo => ({
+      id: dbCombo.id,
+      comboName: dbCombo.name,
+      price: dbCombo.price,
+      thumbnail: dbCombo.thumbnail,
+      isActive: dbCombo.isActive,
+      items: dbCombo.comboItems.map(item => ({
+        id: item.id,
+        comboId: item.comboId,
+        productId: item.productId,
+        quantity: item.quantity,
+        productName: item.product.name,
+        productPrice: item.product.price,
+        productThumbnail: item.product.thumbnail
+      }))
+    }))
+  }
+
   async createProduct(productDto: ProductDto): Promise<Product> {
     const product = await this.prismaService.product.create({
       data: {
@@ -35,6 +63,23 @@ export class ProductService {
       }
     })
     return mapProduct(product)
+  }
+
+  async createManyProducts(productDtos: ProductDto[]): Promise<Product[]> {
+    const createdProducts = await this.prismaService.$transaction(
+      productDtos.map(dto =>
+        this.prismaService.product.create({
+          data: {
+            name: dto.productName,
+            thumbnail: dto.thumbnail || "",
+            price: dto.price || 0,
+            isAvailable: dto.isActive !== undefined ? dto.isActive : true,
+            categoryId: dto.categoryId
+          }
+        })
+      )
+    )
+    return createdProducts.map(mapProduct)
   }
 
   async getDetailProduct(id: string): Promise<Product> {

@@ -20,7 +20,7 @@ export const FeedbackForm = () => {
     resolver: zodResolver(feedbackSchema),
     defaultValues: {
       gender: undefined,
-      birthYear: undefined as any,
+      birthYear: undefined,
       content: ""
     }
   })

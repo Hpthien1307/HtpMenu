@@ -10,10 +10,21 @@ export class ValidationPipe implements PipeTransform {
     if (!metatype || !this.toValidate(metatype)) {
       return value
     }
-    const object = plainToInstance(metatype, value)
-    const errors = await validate(object)
-    if (errors.length > 0) {
-      throw new BadRequestException("validate error")
+
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        const object = plainToInstance(metatype, item)
+        const errors = await validate(object)
+        if (errors.length > 0) {
+          throw new BadRequestException("validate error")
+        }
+      }
+    } else {
+      const object = plainToInstance(metatype, value)
+      const errors = await validate(object)
+      if (errors.length > 0) {
+        throw new BadRequestException("validate error")
+      }
     }
     return value
   }

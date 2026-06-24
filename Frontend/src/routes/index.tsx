@@ -14,6 +14,10 @@ const publicRoutes: RouteConfig[] = [
     component: Menu
   },
   {
+    path: "/:tableId",
+    component: Menu
+  },
+  {
     path: "/gio-hang",
     component: Cart
   },

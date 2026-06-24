@@ -9,6 +9,7 @@ import { useState, useEffect } from "react"
 import { Link, useParams } from "react-router-dom"
 import { FormatPrice } from "@/utils/formatters."
 import { useCart } from "@/hooks/useCart"
+import { API_URL } from "@/config/environment"
 
 const Menu = () => {
   const { tableId: routeTableId } = useParams()
@@ -25,7 +26,7 @@ const Menu = () => {
     isPending: isPendingProducts,
     error: errorProducts
   } = useFetch({
-    url: "http://localhost:3000/products",
+    url: `${API_URL}/products`,
     key: ["products"]
   })
 
@@ -34,7 +35,7 @@ const Menu = () => {
     isPending: isPendingCategories,
     error: errorCategories
   } = useFetch({
-    url: "http://localhost:3000/categories",
+    url: `${API_URL}/categories`,
     key: ["categories"]
   })
 
@@ -43,7 +44,7 @@ const Menu = () => {
     isPending: isPendingCombos,
     error: errorCombos
   } = useFetch({
-    url: "http://localhost:3000/products/combos",
+    url: `${API_URL}/products/combos`,
     key: ["combos"]
   })
 

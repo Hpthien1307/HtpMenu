@@ -13,6 +13,7 @@ import { useState } from "react"
 import { showToast } from "@/utils/showToasts"
 import { Spinner } from "@/components/ui/spinner"
 import type { ProductProps } from "@/components/productItem"
+import { API_URL } from "@/config/environment"
 
 const Cart = () => {
   const { cart, cartItemCount, clearCart } = useCart()
@@ -25,7 +26,7 @@ const Cart = () => {
     isPending: isPendingProducts,
     error: errorProducts
   } = useFetch({
-    url: "http://localhost:3000/products",
+    url: `${API_URL}/products`,
     key: ["products"]
   })
 
@@ -34,7 +35,7 @@ const Cart = () => {
     isPending: isPendingCombos,
     error: errorCombos
   } = useFetch({
-    url: "http://localhost:3000/products/combos",
+    url: `${API_URL}/combos`,
     key: ["combos"]
   })
 

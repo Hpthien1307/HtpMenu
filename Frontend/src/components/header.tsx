@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import useFetch from "@/hooks/useFetch"
 import { Skeleton } from "@/components/ui/skeleton"
 import Error from "@/components/ui/error"
+import { API_URL } from "@/config/environment"
 
 interface HeaderProps {
   activeCategoryId?: string
@@ -16,12 +17,8 @@ const Header = ({ activeCategoryId, onCategoryClick }: HeaderProps) => {
     data: categories,
     isPending: isPendingCategories,
     error: errorCategories
-  } = useFetch({ url: "http://localhost:3000/categories", key: ["categories"] })
-  const {
-    data: combos,
-    isPending: isPendingCombos,
-    error: errorCombos
-  } = useFetch({ url: "http://localhost:3000/products/combos", key: ["combos"] })
+  } = useFetch({ url: `${API_URL}/categories`, key: ["categories"] })
+  const { data: combos, isPending: isPendingCombos, error: errorCombos } = useFetch({ url: `${API_URL}/combos`, key: ["combos"] })
   const [toggle, setToggle] = useState(false)
 
   const isPending = isPendingCategories || isPendingCombos

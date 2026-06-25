@@ -84,14 +84,15 @@ const Menu = () => {
     return products.data.filter((p: any) => recommendations.recommendedProductIds.includes(p.id))
   }, [recommendations?.recommendedProductIds, products?.data])
 
-  const comboProducts = useMemo(() => {
-    if (!recommendations?.smartCombo?.productIds || !products?.data) return []
-    return products.data.filter((p: any) => recommendations.smartCombo.productIds.includes(p.id))
-  }, [recommendations?.smartCombo?.productIds, products?.data])
+  const selectedCombo = useMemo(() => {
+    if (!recommendations?.smartCombo?.comboId || !combos?.data) return null
+    return combos.data.find((c: any) => c.id === recommendations.smartCombo.comboId)
+  }, [recommendations?.smartCombo?.comboId, combos?.data])
 
   const originalComboPrice = useMemo(() => {
-    return comboProducts.reduce((sum: number, p: any) => sum + (p.price || 0), 0)
-  }, [comboProducts])
+    if (!selectedCombo?.items) return 0
+    return selectedCombo.items.reduce((sum: number, item: any) => sum + (item.productPrice || 0) * (item.quantity || 1), 0)
+  }, [selectedCombo])
 
   const mergedCategories = useMemo(() => {
     return categories?.data && combos?.data && combos.data.length > 0
@@ -182,8 +183,8 @@ const Menu = () => {
   return (
     <WrapperMain classCustom="page-menu">
       {window.innerWidth > 1024 && !tableId ? (
-        <div className="h-screen w-full flex flex-col items-center justify-center gap-y-6">
-          <p className="font-semibold text-3xl">Vui lòng quét mã QR để ord</p>
+        <div className="h-screen w-full flex flex-col items-center justify-center gap-y-8">
+          <p className="font-semibold text-4xl">Vui lòng quét mã QR để order</p>
           <Link to={randomTable ? `/?tableId=${randomTable.id}` : "#"} className="w-[36rem] h-[36rem] aspect-square">
             <img src={dynamicQrUrl} alt="QRCode" className="contain-default w-full h-full" />
           </Link>
@@ -240,29 +241,35 @@ const Menu = () => {
                     ) : recommendations ? (
                       <div className="mt-5 space-y-5">
                         {/* Smart Combo Card */}
-                        {recommendations.smartCombo && (
+                        {selectedCombo && (
                           <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 dark:from-amber-500/20 dark:to-orange-500/20 border border-amber-500/20 dark:border-amber-500/30 rounded-2xl p-5 relative overflow-hidden flex flex-col md:flex-row justify-between gap-5">
                             <div className="flex-1 space-y-2">
                               <div className="inline-flex items-center gap-1 bg-amber-500 text-white text-xl font-bold px-4 py-1 rounded-full uppercase tracking-wider">
                                 Combo khuyên dùng
                               </div>
-                              <h3 className=" font-bold text-slate-800 dark:text-white">{recommendations.smartCombo.comboName}</h3>
+                              <h3 className="text-xl font-bold text-slate-800 dark:text-white">{selectedCombo.comboName}</h3>
                               <p className="italic text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
                                 "{recommendations.smartCombo.reason}"
                               </p>
 
                               {/* Combo items list */}
                               <div className="flex items-center gap-2 mt-3 flex-wrap">
-                                {comboProducts.map((p: any, idx: number) => (
+                                {selectedCombo.items?.map((item: any, idx: number) => (
                                   <div
-                                    key={p.id}
+                                    key={item.id}
                                     className="flex items-center gap-1.5 bg-white/70 dark:bg-black/30 px-2 py-1 rounded-lg font-semibold border border-amber-500/15"
                                   >
-                                    {p.thumbnail && (
-                                      <img src={p.thumbnail} alt={p.productName} className="w-5 h-5 rounded-full object-cover" />
+                                    {item.productThumbnail && (
+                                      <img
+                                        src={item.productThumbnail}
+                                        alt={item.productName}
+                                        className="w-5 h-5 rounded-full object-cover"
+                                      />
                                     )}
-                                    <span className="text-slate-700 dark:text-slate-200">{p.productName}</span>
-                                    {idx < comboProducts.length - 1 && <span className="text-amber-500 font-bold ml-1">+</span>}
+                                    <span className="text-slate-700 dark:text-slate-200">
+                                      {item.productName} {item.quantity > 1 && `x${item.quantity}`}
+                                    </span>
+                                    {idx < selectedCombo.items.length - 1 && <span className="text-amber-500 font-bold ml-1">+</span>}
                                   </div>
                                 ))}
                               </div>
@@ -270,22 +277,20 @@ const Menu = () => {
 
                             <div className="flex flex-col items-start md:items-end justify-center min-w-[150px] border-t md:border-t-0 md:border-l border-amber-500/10 pt-4 md:pt-0 md:pl-5">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className="line-through text-smxl text-slate-400 dark:text-slate-500 font-medium">
+                                <span className="line-through text-slate-400 dark:text-slate-500 font-medium">
                                   {FormatPrice(originalComboPrice)}
                                 </span>
                                 <span className="bg-red-100 text-2xl dark:bg-red-950/80 text-red-600 dark:text-red-300 font-bold px-1.5 py-0.5 rounded">
-                                  Tiết kiệm {FormatPrice(originalComboPrice - recommendations.smartCombo.discountPrice)}
+                                  Tiết kiệm {FormatPrice(originalComboPrice - selectedCombo.price)}
                                 </span>
                               </div>
-                              <span className="font-extrabold text-amber-600 dark:text-amber-400 mt-1">
-                                {FormatPrice(recommendations.smartCombo.discountPrice)}
+                              <span className="text-2xl font-extrabold text-amber-600 dark:text-amber-400 mt-1">
+                                {FormatPrice(selectedCombo.price)}
                               </span>
                               <button
                                 onClick={() => {
-                                  if (recommendations.smartCombo?.productIds) {
-                                    addItemsToCart(recommendations.smartCombo.productIds)
-                                    showToast.success(`Đã thêm ${recommendations.smartCombo.comboName} vào giỏ hàng!`)
-                                  }
+                                  handleIncrease(selectedCombo.id)
+                                  showToast.success(`Đã thêm ${selectedCombo.comboName} vào giỏ hàng!`)
                                 }}
                                 className="mt-3 cursor-pointer w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold py-2 px-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-1.5 uppercase tracking-wide"
                               >

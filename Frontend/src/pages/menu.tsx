@@ -15,6 +15,7 @@ const Menu = () => {
   const { tableId: routeTableId } = useParams()
   const [displayMode, setDisplayMode] = useState<"list" | "grid">("list")
   const [activeCategoryId, setActiveCategoryId] = useState("")
+  const [randomTable, setRandomTable] = useState<any>(null)
   const { cart, cartItemCount } = useCart()
 
   const handleDisplayMode = () => {
@@ -47,6 +48,22 @@ const Menu = () => {
     url: `${API_URL}/products/combos`,
     key: ["combos"]
   })
+
+  const {
+    data: tables,
+    isPending: isPendingTables,
+    error: errorTables
+  } = useFetch({
+    url: `${API_URL}/tables`,
+    key: ["tables"]
+  })
+
+  useEffect(() => {
+    if (tables?.data && tables.data.length > 0 && !randomTable) {
+      const randomIndex = Math.floor(Math.random() * tables.data.length)
+      setRandomTable(tables.data[randomIndex])
+    }
+  }, [tables, randomTable])
 
   const mergedCategories =
     categories?.data && combos?.data && combos.data.length > 0
@@ -135,75 +152,87 @@ const Menu = () => {
 
   return (
     <WrapperMain classCustom="page-menu">
-      {/* header */}
-      <Header activeCategoryId={activeCategoryId} onCategoryClick={handleCategoryClick} />
+      {window.innerWidth > 1024 ? (
+        <div className="h-screen w-full flex flex-col items-center justify-center gap-y-6">
+          <p className="font-semibold text-3xl">Vui lòng quét mã QR để order</p>
+          <Link to={randomTable ? `/?tableId=${randomTable.id}` : "#"} className="w-[36rem] h-[36rem] aspect-square">
+            <img src={randomTable ? randomTable.qrCodeUrl : "./myqr.png"} alt="QRCode" className="contain-default w-full h-full" />
+          </Link>
+        </div>
+      ) : (
+        <>
+          {/* header */}
+          <Header activeCategoryId={activeCategoryId} onCategoryClick={handleCategoryClick} />
 
-      {/* menu main */}
-      <section className="sec-menu-main">
-        <div className="menu-main">
-          <div className="container">
-            <div className="flex flex-col gap-y-6 ">
-              <div className="menu-main__header pb-6 border-b border-gray-200 flex justify-between gap-2 items-center">
-                <p>
-                  Tất cả
-                  <span className="font-semibold"> {mergedProducts?.length || 0} </span>
-                  món
-                </p>
-                <div className="inline-flex items-center gap-4 rounded-full bg-gray-100 py-3 px-6">
-                  <button type="button" onClick={handleDisplayMode} className={` ${displayMode === "list" ? "text-blue-600" : ""}`}>
-                    <List size={20} />
-                  </button>
-                  |
-                  <button type="button" onClick={handleDisplayMode} className={` ${displayMode === "grid" ? "text-blue-600" : ""}`}>
-                    <LayoutGrid size={20} />
-                  </button>
-                </div>
-              </div>
-              <div className="menu-menu__body">
-                <div className="flex flex-col gap-y-8">
-                  {isPending ? (
-                    Array.from({ length: 5 }).map((_, index) => <Skeleton className="w-full h-[12rem] rounded-2xl" key={index} />)
-                  ) : error ? (
-                    <Error />
-                  ) : (
-                    mergedCategories?.map((category: any) => {
-                      const categoryProducts = mergedProducts?.filter((product: ProductProps) => product.categoryId === category.id) || []
+          {/* menu main */}
+          <section className="sec-menu-main">
+            <div className="menu-main">
+              <div className="container">
+                <div className="flex flex-col gap-y-6 ">
+                  <div className="menu-main__header pb-6 border-b border-gray-200 flex justify-between gap-2 items-center">
+                    <p>
+                      Tất cả
+                      <span className="font-semibold"> {mergedProducts?.length || 0} </span>
+                      món
+                    </p>
+                    <div className="inline-flex items-center gap-4 rounded-full bg-gray-100 py-3 px-6">
+                      <button type="button" onClick={handleDisplayMode} className={` ${displayMode === "list" ? "text-blue-600" : ""}`}>
+                        <List size={20} />
+                      </button>
+                      |
+                      <button type="button" onClick={handleDisplayMode} className={` ${displayMode === "grid" ? "text-blue-600" : ""}`}>
+                        <LayoutGrid size={20} />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="menu-menu__body">
+                    <div className="flex flex-col gap-y-8">
+                      {isPending ? (
+                        Array.from({ length: 5 }).map((_, index) => <Skeleton className="w-full h-[12rem] rounded-2xl" key={index} />)
+                      ) : error ? (
+                        <Error />
+                      ) : (
+                        mergedCategories?.map((category: any) => {
+                          const categoryProducts =
+                            mergedProducts?.filter((product: ProductProps) => product.categoryId === category.id) || []
 
-                      if (categoryProducts.length === 0) return null
+                          if (categoryProducts.length === 0) return null
 
-                      return (
-                        <div key={category.id} id={`category-${category.id}`} className="flex flex-col gap-y-4">
-                          <h3 className="text-3xl font-medium capitalize border-l-3 border-black pl-3 mb-4">
-                            {category.categoryName}
-                            <span> ({categoryProducts?.length})</span>
-                          </h3>
-                          <div className={`${displayMode === "list" ? "flex flex-col" : "grid grid-cols-2"} gap-6`}>
-                            {categoryProducts.map((product: ProductProps) => (
-                              <ProductsItem key={product.id} product={{ ...product, layout: displayMode }} />
-                            ))}
-                          </div>
-                        </div>
-                      )
-                    })
-                  )}
+                          return (
+                            <div key={category.id} id={`category-${category.id}`} className="flex flex-col gap-y-4">
+                              <h3 className="text-3xl font-medium capitalize border-l-3 border-black pl-3 mb-4">
+                                {category.categoryName}
+                                <span> ({categoryProducts?.length})</span>
+                              </h3>
+                              <div className={`${displayMode === "list" ? "flex flex-col" : "grid grid-cols-2"} gap-6`}>
+                                {categoryProducts.map((product: ProductProps) => (
+                                  <ProductsItem key={product.id} product={{ ...product, layout: displayMode }} />
+                                ))}
+                              </div>
+                            </div>
+                          )
+                        })
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
+          </section>
 
-      {cartItemCount > 0 && (
-        <div className="fixed w-full bottom-6 left-1/2 -translate-x-1/2">
-          <div className="container">
-            <Link to={"/gio-hang"} className="flex justify-between items-center gap-2 bg-blue-600 p-4 text-white rounded-md shadow-lg">
-              <span>Xác nhận gọi món</span>
-              <div className="inline-flex items-center gap-4">
-                <span>{`${cartItemCount} món`}</span>|<span className="font-semibold">{FormatPrice(totalPrice)}</span>
+          {cartItemCount > 0 && (
+            <div className="fixed w-full bottom-6 left-1/2 -translate-x-1/2">
+              <div className="container">
+                <Link to={"/gio-hang"} className="flex justify-between items-center gap-2 bg-blue-600 p-4 text-white rounded-md shadow-lg">
+                  <span>Xác nhận gọi món</span>
+                  <div className="inline-flex items-center gap-4">
+                    <span>{`${cartItemCount} món`}</span>|<span className="font-semibold">{FormatPrice(totalPrice)}</span>
+                  </div>
+                </Link>
               </div>
-            </Link>
-          </div>
-        </div>
+            </div>
+          )}
+        </>
       )}
     </WrapperMain>
   )

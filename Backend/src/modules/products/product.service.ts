@@ -2,7 +2,7 @@ import { ProductDto } from "../../dto/product.dto"
 import { Product } from "../../models/products.model"
 import { Injectable } from "@nestjs/common"
 import { PrismaService } from "../../prisma/prisma.service"
-import { SearchDto } from "@/dto/search.dto"
+import { SearchDto } from "../../dto/search.dto"
 
 // Helper function to map database record to Product model
 function mapProduct(dbProduct: any): Product {

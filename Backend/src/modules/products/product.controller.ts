@@ -4,7 +4,7 @@ import { ResponseData } from "../../global/globalClass"
 import { HttpMessage, HttpStatus } from "../../global/globalEnum"
 import { Product, Combo } from "../../models/products.model"
 import { ProductDto } from "../../dto/product.dto"
-import { SearchDto } from "@/dto/search.dto"
+import { SearchDto } from "../../dto/search.dto"
 
 @Controller("products")
 export class ProductController {

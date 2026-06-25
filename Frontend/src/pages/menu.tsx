@@ -49,11 +49,7 @@ const Menu = () => {
     key: ["combos"]
   })
 
-  const {
-    data: tables,
-    isPending: isPendingTables,
-    error: errorTables
-  } = useFetch({
+  const { data: tables } = useFetch({
     url: `${API_URL}/tables`,
     key: ["tables"]
   })

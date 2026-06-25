@@ -63,13 +63,13 @@ const Menu = () => {
   }, [tables, randomTable])
 
   const currentFrontendUrl = window.location.origin
-  const dynamicQrUrl = randomTable 
+  const dynamicQrUrl = randomTable
     ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${currentFrontendUrl}/?tableId=${randomTable.id}`
     : `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${currentFrontendUrl}/`
 
   const mergedCategories =
     categories?.data && combos?.data && combos.data.length > 0
-      ? [...categories.data, { id: "combo-category-id", categoryName: "Combo" }]
+      ? [{ id: "combo-category-id", categoryName: "Combo" }, ...categories.data]
       : categories?.data || []
 
   const mergedProducts =
@@ -156,7 +156,7 @@ const Menu = () => {
     <WrapperMain classCustom="page-menu">
       {window.innerWidth > 1024 && !tableId ? (
         <div className="h-screen w-full flex flex-col items-center justify-center gap-y-6">
-          <p className="font-semibold text-3xl">Vui lòng quét mã QR để order</p>
+          <p className="font-semibold text-3xl">Vui lòng quét mã QR để ord</p>
           <Link to={randomTable ? `/?tableId=${randomTable.id}` : "#"} className="w-[36rem] h-[36rem] aspect-square">
             <img src={dynamicQrUrl} alt="QRCode" className="contain-default w-full h-full" />
           </Link>

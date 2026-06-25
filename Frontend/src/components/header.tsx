@@ -6,6 +6,7 @@ import useFetch from "@/hooks/useFetch"
 import { Skeleton } from "@/components/ui/skeleton"
 import Error from "@/components/ui/error"
 import { API_URL } from "@/config/environment"
+import { ProductsItem } from "@/components/productItem"
 
 interface HeaderProps {
   activeCategoryId?: string
@@ -20,18 +21,55 @@ const Header = ({ activeCategoryId, onCategoryClick }: HeaderProps) => {
   } = useFetch({ url: `${API_URL}/categories`, key: ["categories"] })
   const { data: combos, isPending: isPendingCombos, error: errorCombos } = useFetch({ url: `${API_URL}/products/combos`, key: ["combos"] })
   const [toggle, setToggle] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [isSearching, setIsSearching] = useState(false)
 
   const isPending = isPendingCategories || isPendingCombos
   const error = errorCategories || errorCombos
 
   const mergedCategories =
     categories?.data && combos?.data && combos.data.length > 0
-      ? [...categories.data, { id: "combo-category-id", categoryName: "Combo" }]
+      ? [{ id: "combo-category-id", categoryName: "Combo" }, ...categories.data]
       : categories?.data || []
 
   const handleToggle = () => {
-    setToggle(prev => !prev)
+    setToggle(prev => {
+      const nextToggle = !prev
+      if (!nextToggle) {
+        setSearchQuery("")
+        setSearchResults([])
+      }
+      return nextToggle
+    })
   }
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([])
+      return
+    }
+
+    setIsSearching(true)
+    const delayDebounceFn = setTimeout(async () => {
+      try {
+        const response = await fetch(`${API_URL}/products/search?keyword=${encodeURIComponent(searchQuery)}`)
+        const resData = await response.json()
+        if (resData && resData.data) {
+          setSearchResults(resData.data)
+        } else {
+          setSearchResults([])
+        }
+      } catch (err) {
+        console.error("Lỗi tìm kiếm sản phẩm:", err)
+        setSearchResults([])
+      } finally {
+        setIsSearching(false)
+      }
+    }, 500)
+
+    return () => clearTimeout(delayDebounceFn)
+  }, [searchQuery])
 
   useEffect(() => {
     if (activeCategoryId) {
@@ -121,15 +159,40 @@ const Header = ({ activeCategoryId, onCategoryClick }: HeaderProps) => {
                   <span>Món đã gọi</span>
                 </Link>
               </div>
-              <div className={`w-full items-center gap-4 ${toggle ? "flex" : "hidden"}`}>
+              <div className={`w-full items-center gap-4 ${toggle ? "flex" : "hidden"} relative`}>
                 <Input
                   type="search"
                   placeholder="Tìm kiếm..."
-                  className="w-full h-[4.8rem] max-md:h-[4rem] px-4 py-6 bg-white rounded-2xl"
+                  className="w-full h-[4.8rem] max-md:h-[4rem] px-4 py-6 bg-white rounded-2xl text-black font-normal"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
                 />
                 <button type="button" onClick={handleToggle}>
                   <XCircle className="text-white" size={30} />
                 </button>
+                {searchQuery.trim() && (
+                  <div className="absolute top-[110%] left-0 w-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 max-h-[30rem] overflow-y-auto p-4 flex flex-col gap-4 text-black">
+                    {isSearching ? (
+                      <div className="text-xl text-gray-500 text-center py-4">Đang tìm kiếm...</div>
+                    ) : searchResults.length === 0 ? (
+                      <div className="text-xl text-gray-500 text-center py-4">Không tìm thấy món ăn nào</div>
+                    ) : (
+                      searchResults.map((product: any) => (
+                        <ProductsItem
+                          key={product.id}
+                          product={{
+                            id: product.id,
+                            productName: product.productName,
+                            price: product.price,
+                            thumbnail: product.thumbnail,
+                            isActive: product.isActive,
+                            layout: "list"
+                          }}
+                        />
+                      ))
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>

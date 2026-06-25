@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Put, Delete, Param, Body } from "@nestjs/common"
+import { Controller, Get, Post, Put, Delete, Param, Body, Query } from "@nestjs/common"
 import { ProductService } from "../../modules/products/product.service"
 import { ResponseData } from "../../global/globalClass"
 import { HttpMessage, HttpStatus } from "../../global/globalEnum"
 import { Product, Combo } from "../../models/products.model"
 import { ProductDto } from "../../dto/product.dto"
+import { SearchDto } from "@/dto/search.dto"
 
 @Controller("products")
 export class ProductController {
@@ -16,6 +17,17 @@ export class ProductController {
       return new ResponseData<Product[]>(data, HttpStatus.OK, HttpMessage.SUCCESS)
     } catch (error) {
       console.error("Error getting all products", error)
+      return new ResponseData<Product[]>(null, HttpStatus.NOT_FOUND, HttpMessage.NOT_FOUND)
+    }
+  }
+
+  @Get("search")
+  async getSearchProducts(@Query() query: SearchDto): Promise<ResponseData<Product[]>> {
+    try {
+      const data = await this.productService.getSearchProducts(query)
+      return new ResponseData<Product[]>(data, HttpStatus.OK, HttpMessage.SUCCESS)
+    } catch (error) {
+      console.error("Error searching products", error)
       return new ResponseData<Product[]>(null, HttpStatus.NOT_FOUND, HttpMessage.NOT_FOUND)
     }
   }

@@ -2,6 +2,7 @@ import { ProductDto } from "../../dto/product.dto"
 import { Product } from "../../models/products.model"
 import { Injectable } from "@nestjs/common"
 import { PrismaService } from "../../prisma/prisma.service"
+import { SearchDto } from "@/dto/search.dto"
 
 // Helper function to map database record to Product model
 function mapProduct(dbProduct: any): Product {
@@ -50,6 +51,31 @@ export class ProductService {
         productThumbnail: item.product.thumbnail
       }))
     }))
+  }
+
+  async getSearchProducts(query: SearchDto): Promise<Product[]> {
+    const { keyword, categories } = query
+    const where: any = {}
+
+    // Logic 1: Lọc theo tên sản phẩm gần đúng (không phân biệt chữ hoa/thường)
+    if (keyword) {
+      where.name = {
+        contains: keyword,
+        mode: "insensitive"
+      }
+    }
+
+    // Logic 2: Lọc theo danh mục sản phẩm
+    if (categories) {
+      where.categoryId = categories
+    }
+
+    const dbProducts = await this.prismaService.product.findMany({
+      where
+    })
+
+    // Trả kết quả cuối cùng về cho Controller sau khi map sang model Product
+    return dbProducts.map(mapProduct)
   }
 
   async createProduct(productDto: ProductDto): Promise<Product> {

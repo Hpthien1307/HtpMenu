@@ -18,7 +18,7 @@ const Menu = () => {
   const [displayMode, setDisplayMode] = useState<"list" | "grid">("list")
   const [activeCategoryId, setActiveCategoryId] = useState("")
   const [randomTable, setRandomTable] = useState<any>(null)
-  const { cart, cartItemCount, handleIncrease, addItemsToCart } = useCart()
+  const { cart, cartItemCount, handleIncrease } = useCart()
 
   const handleDisplayMode = () => {
     setDisplayMode(prev => (prev === "list" ? "grid" : "list"))

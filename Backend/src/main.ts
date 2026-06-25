@@ -1,12 +1,4 @@
-import { register } from "tsconfig-paths"
-
-register({
-  baseUrl: __dirname,
-  paths: {
-    "@/*": ["./*"],
-  },
-})
-
+import "./paths"
 import { NestFactory } from "@nestjs/core"
 import { AppModule } from "./app.module"
 import { ValidationPipe } from "./validation.pipe"

@@ -35,7 +35,7 @@ const Cart = () => {
     isPending: isPendingCombos,
     error: errorCombos
   } = useFetch({
-    url: `${API_URL}/combos`,
+    url: `${API_URL}/products/combos`,
     key: ["combos"]
   })
 

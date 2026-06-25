@@ -18,7 +18,7 @@ const Header = ({ activeCategoryId, onCategoryClick }: HeaderProps) => {
     isPending: isPendingCategories,
     error: errorCategories
   } = useFetch({ url: `${API_URL}/categories`, key: ["categories"] })
-  const { data: combos, isPending: isPendingCombos, error: errorCombos } = useFetch({ url: `${API_URL}/combos`, key: ["combos"] })
+  const { data: combos, isPending: isPendingCombos, error: errorCombos } = useFetch({ url: `${API_URL}/products/combos`, key: ["combos"] })
   const [toggle, setToggle] = useState(false)
 
   const isPending = isPendingCategories || isPendingCombos

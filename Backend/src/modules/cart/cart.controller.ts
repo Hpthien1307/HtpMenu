@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Put, Delete, Param, Body } from "@nestjs/common"
 import { CartService } from "./cart.service"
-import { ResponseData } from "@/global/globalClass"
-import { HttpMessage, HttpStatus } from "@/global/globalEnum"
-import { Cart } from "@/models/cart.model"
-import { CartDto, UpdateCartDto } from "@/dto/cart.dto"
+import { ResponseData } from "../../global/globalClass"
+import { HttpMessage, HttpStatus } from "../../global/globalEnum"
+import { Cart } from "../../models/cart.model"
+import { CartDto, UpdateCartDto } from "../../dto/cart.dto"
 
 @Controller("cart")
 export class CartController {

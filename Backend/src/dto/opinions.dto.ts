@@ -1,5 +1,5 @@
 import { IsEnum, IsInt, IsNotEmpty, IsString, Min, Max } from "class-validator"
-import { Gender } from "@/models/opinions.model"
+import { Gender } from "../models/opinions.model"
 
 export class OpinionsDto {
   @IsNotEmpty({ message: "Giới tính không được để trống" })

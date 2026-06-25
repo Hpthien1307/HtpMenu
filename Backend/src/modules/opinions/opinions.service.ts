@@ -1,7 +1,7 @@
-import { Opinion, Gender } from "@/models/opinions.model"
+import { Opinion, Gender } from "../../models/opinions.model"
 import { Injectable } from "@nestjs/common"
-import { PrismaService } from "@/prisma/prisma.service"
-import { OpinionsDto } from "@/dto/opinions.dto"
+import { PrismaService } from "../../prisma/prisma.service"
+import { OpinionsDto } from "../../dto/opinions.dto"
 
 @Injectable()
 export class OpinionsService {

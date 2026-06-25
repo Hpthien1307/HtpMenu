@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common"
-import { Cart } from "@/models/cart.model"
-import { PrismaService } from "@/prisma/prisma.service"
-import { CartDto, UpdateCartDto } from "@/dto/cart.dto"
+import { Cart } from "../../models/cart.model"
+import { PrismaService } from "../../prisma/prisma.service"
+import { CartDto, UpdateCartDto } from "../../dto/cart.dto"
 
 function mapCart(dbCart: any): Cart {
   return new Cart({

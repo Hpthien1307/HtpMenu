@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Put, Delete, Param, Body } from "@nestjs/common"
-import { OpinionsService } from "@/modules/opinions/opinions.service"
-import { ResponseData } from "@/global/globalClass"
-import { HttpMessage, HttpStatus } from "@/global/globalEnum"
-import { Opinion } from "@/models/opinions.model"
-import { OpinionsDto } from "@/dto/opinions.dto"
+import { OpinionsService } from "../../modules/opinions/opinions.service"
+import { ResponseData } from "../../global/globalClass"
+import { HttpMessage, HttpStatus } from "../../global/globalEnum"
+import { Opinion } from "../../models/opinions.model"
+import { OpinionsDto } from "../../dto/opinions.dto"
 
 @Controller("opinions")
 export class OpinionsController {

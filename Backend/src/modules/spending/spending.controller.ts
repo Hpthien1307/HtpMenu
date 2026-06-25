@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Put, Delete, HttpStatus, Param, Body } from "@nestjs/common"
-import { SpendingService } from "@/modules/spending/spending.service"
-import { Spending } from "@/models/spending.model"
-import { ResponseData } from "@/global/globalClass"
-import { HttpMessage } from "@/global/globalEnum"
-import { SpendingDto } from "@/dto/spending.dto"
+import { SpendingService } from "../../modules/spending/spending.service"
+import { Spending } from "../../models/spending.model"
+import { ResponseData } from "../../global/globalClass"
+import { HttpMessage } from "../../global/globalEnum"
+import { SpendingDto } from "../../dto/spending.dto"
 
 @Controller("spendings")
 export class SpendingContollers {

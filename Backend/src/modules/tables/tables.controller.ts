@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Param, Body } from "@nestjs/common"
 import { TablesService } from "./tables.service"
-import { ResponseData } from "@/global/globalClass"
-import { HttpMessage, HttpStatus } from "@/global/globalEnum"
+import { ResponseData } from "../../global/globalClass"
+import { HttpMessage, HttpStatus } from "../../global/globalEnum"
 
 @Controller("tables")
 export class TablesController {

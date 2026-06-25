@@ -1,7 +1,7 @@
-import { Category } from "@/models/products.model"
+import { Category } from "../../models/products.model"
 import { Injectable } from "@nestjs/common"
-import { PrismaService } from "@/prisma/prisma.service"
-import { CategoryDto } from "@/dto/categories.dto"
+import { PrismaService } from "../../prisma/prisma.service"
+import { CategoryDto } from "../../dto/categories.dto"
 
 function mapCategory(dbCategory: any): Category {
   return {

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common"
-import { Order, OrderItem, OrderStatus, PaymentStatus } from "@/models/orders.model"
-import { PrismaService } from "@/prisma/prisma.service"
+import { Order, OrderItem, OrderStatus, PaymentStatus } from "../../models/orders.model"
+import { PrismaService } from "../../prisma/prisma.service"
 
 const orderStatusStrMap = ["PENDING", "COOKING", "COMPLETED", "CANCELLED"]
 const paymentStatusStrMap = ["UNPAID", "PAID"]

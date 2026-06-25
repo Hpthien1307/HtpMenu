@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Put, Delete, Param, Body } from "@nestjs/common"
-import { OrderService } from "@/modules/orders/orders.service"
-import { Order } from "@/models/orders.model"
-import { HttpMessage } from "@/global/globalEnum"
-import { HttpStatus } from "@/global/globalEnum"
-import { ResponseData } from "@/global/globalClass"
-import { OrderDto } from "@/dto/orders.dto"
+import { OrderService } from "../../modules/orders/orders.service"
+import { Order } from "../../models/orders.model"
+import { HttpMessage } from "../../global/globalEnum"
+import { HttpStatus } from "../../global/globalEnum"
+import { ResponseData } from "../../global/globalClass"
+import { OrderDto } from "../../dto/orders.dto"
 
 @Controller("orders")
 export class OrderController {

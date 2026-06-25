@@ -1,6 +1,6 @@
-import { Spending } from "@/models/spending.model"
+import { Spending } from "../../models/spending.model"
 import { Injectable } from "@nestjs/common"
-import { PrismaService } from "@/prisma/prisma.service"
+import { PrismaService } from "../../prisma/prisma.service"
 
 function mapSpending(dbSpending: any): Spending {
   return {

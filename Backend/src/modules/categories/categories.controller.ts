@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Put, Delete, Param, Body } from "@nestjs/common"
-import { CategoriesService } from "@/modules/categories/categories.service"
-import { ResponseData } from "@/global/globalClass"
-import { HttpMessage, HttpStatus } from "@/global/globalEnum"
-import { Category } from "@/models/products.model"
-import { CategoryDto } from "@/dto/categories.dto"
+import { CategoriesService } from "../../modules/categories/categories.service"
+import { ResponseData } from "../../global/globalClass"
+import { HttpMessage, HttpStatus } from "../../global/globalEnum"
+import { Category } from "../../models/products.model"
+import { CategoryDto } from "../../dto/categories.dto"
 
 @Controller("categories")
 export class CategoriesController {

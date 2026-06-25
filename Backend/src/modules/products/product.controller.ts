@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Put, Delete, Param, Body } from "@nestjs/common"
-import { ProductService } from "@/modules/products/product.service"
-import { ResponseData } from "@/global/globalClass"
-import { HttpMessage, HttpStatus } from "@/global/globalEnum"
-import { Product, Combo } from "@/models/products.model"
-import { ProductDto } from "@/dto/product.dto"
+import { ProductService } from "../../modules/products/product.service"
+import { ResponseData } from "../../global/globalClass"
+import { HttpMessage, HttpStatus } from "../../global/globalEnum"
+import { Product, Combo } from "../../models/products.model"
+import { ProductDto } from "../../dto/product.dto"
 
 @Controller("products")
 export class ProductController {

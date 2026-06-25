@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Put, Delete, Param, Body } from "@nestjs/common";
-import { EmployeesService } from "@/modules/employees/employees.service";
-import { ResponseData } from "@/global/globalClass";
-import { HttpMessage, HttpStatus } from "@/global/globalEnum";
-import { Employee } from "@/models/employees.model";
-import { EmployeeDto } from "@/dto/employees.dto";
+import { EmployeesService } from "../../modules/employees/employees.service";
+import { ResponseData } from "../../global/globalClass";
+import { HttpMessage, HttpStatus } from "../../global/globalEnum";
+import { Employee } from "../../models/employees.model";
+import { EmployeeDto } from "../../dto/employees.dto";
 
 @Controller("employees")
 export class EmployeesController {

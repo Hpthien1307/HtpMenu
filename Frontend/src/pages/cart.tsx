@@ -111,7 +111,7 @@ const Cart = () => {
       setNote("")
       setTimeout(() => {
         navigate("/")
-      }, 1000)
+      }, 200)
     } catch (error) {
       console.error("Lỗi đặt món:", error)
       showToast.error("Đặt món thất bại. Vui lòng thử lại!")

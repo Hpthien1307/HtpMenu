@@ -10,6 +10,7 @@ import { EmployeesModule } from "./modules/employees/employees.module"
 import { OpinionsModule } from "./modules/opinions/opinions.module"
 import { CartModule } from "./modules/cart/cart.module"
 import { TablesModule } from "./modules/tables/tables.module"
+import { AiModule } from "./modules/AI/ai.module"
 
 @Module({
   imports: [
@@ -21,7 +22,8 @@ import { TablesModule } from "./modules/tables/tables.module"
     EmployeesModule,
     OpinionsModule,
     CartModule,
-    TablesModule
+    TablesModule,
+    AiModule
   ],
   controllers: [AppController],
   providers: [AppService]

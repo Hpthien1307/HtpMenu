@@ -41,6 +41,16 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     setCart({})
   }
 
+  const addItemsToCart = (productIds: string[]) => {
+    setCart(prev => {
+      const nextCart = { ...prev }
+      productIds.forEach(id => {
+        nextCart[id] = (nextCart[id] || 0) + 1
+      })
+      return nextCart
+    })
+  }
+
   const cartItemCount = Object.values(cart).reduce((sum, qty) => sum + qty, 0)
 
   return (
@@ -51,7 +61,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         handleIncrease,
         handleDecrease,
         getQuantity,
-        clearCart
+        clearCart,
+        addItemsToCart
       }}
     >
       {children}

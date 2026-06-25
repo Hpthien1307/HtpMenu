@@ -7,6 +7,7 @@ export interface CartContextType {
   handleDecrease: (productId: string) => void
   getQuantity: (productId: string) => number
   clearCart: () => void
+  addItemsToCart: (productIds: string[]) => void
 }
 
 export const CartContext = createContext<CartContextType | undefined>(undefined)

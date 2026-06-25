@@ -34,7 +34,8 @@ export class TablesService {
       }
     })
 
-    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=http://localhost:5173/?tableId=${table.id}`
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173"
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${frontendUrl}/?tableId=${table.id}`
     
     return this.prismaService.table.update({
       where: { id: table.id },

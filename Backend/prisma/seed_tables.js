@@ -19,7 +19,8 @@ async function main() {
     })
 
     // 2. Generate actual QR code URL referencing the table's UUID
-    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=http://localhost:5173/?tableId=${table.id}`
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173"
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${frontendUrl}/?tableId=${table.id}`
 
     // 3. Update the table with the QR code URL
     await prisma.table.update({

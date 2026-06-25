@@ -13,6 +13,7 @@ import { API_URL } from "@/config/environment"
 
 const Menu = () => {
   const { tableId: routeTableId } = useParams()
+  const tableId = new URLSearchParams(window.location.search).get("tableId") || routeTableId
   const [displayMode, setDisplayMode] = useState<"list" | "grid">("list")
   const [activeCategoryId, setActiveCategoryId] = useState("")
   const [randomTable, setRandomTable] = useState<any>(null)
@@ -148,11 +149,11 @@ const Menu = () => {
 
   return (
     <WrapperMain classCustom="page-menu">
-      {window.innerWidth > 1024 ? (
+      {window.innerWidth > 1024 && !tableId ? (
         <div className="h-screen w-full flex flex-col items-center justify-center gap-y-6">
           <p className="font-semibold text-3xl">Vui lòng quét mã QR để order</p>
           <Link to={randomTable ? `/?tableId=${randomTable.id}` : "#"} className="w-[36rem] h-[36rem] aspect-square">
-            <img src={randomTable ? randomTable.qrCodeUrl : "./myqr.png"} alt="QRCode" className="contain-default w-full h-full" />
+            <img src="./myqr.png" alt="QRCode" className="contain-default w-full h-full" />
           </Link>
         </div>
       ) : (
